@@ -31,7 +31,7 @@
             font-family: Arial, Helvetica, sans-serif;
             font-size: 20px;
             margin: 10px 0; /* Adding margin between elements */
-            width: 250px; /* Setting input width */
+            width: 80%; /* Setting input width */
             padding: 5px; /* Adding padding to input */
          }
          button {
@@ -48,28 +48,83 @@
       </style>
       <script>
          // Define the function to call the API with the provided first name, last name, and phone number
-         let callAPI = (document)=>{
-            // Create a new Headers object and set the 'Content-Type' to 'application/json'
-            let myHeaders = new Headers();
-            myHeaders.append("Content-Type", "application/json");
+         let callAPI = (doc)=>{
+            document.getElementById("status").innerHTML = "Processing..."
 
-            let formData = new FormData();
-     
-            formData.append("document", document);
-            
-            // Define the request options including method, headers, body, and redirect behavior
-            let requestOptions = {
-                method: 'POST', // Method type
-                headers: myHeaders, // Headers for the request
-                body: formData, // The body of the request containing the JSON string
-                redirect: 'follow' // Automatically follow redirects
+            let getRealMimeType = function (reader) {
+               var arr = (new Uint8Array(reader.result)).subarray(0, 4);
+               var header = '';
+               var realMimeType;
+
+               for (var i = 0; i < arr.length; i++) {
+                  header += arr[i].toString(16);
+               }
+
+               // magic numbers: http://www.garykessler.net/library/file_sigs.html
+               switch (header) {
+                  case "89504e47":
+                        realMimeType = "image/png";
+                        break;
+                  case "47494638":
+                        realMimeType = "image/gif";
+                        break;
+                  case "ffd8ffDB":
+                  case "ffd8ffe0":
+                  case "ffd8ffe1":
+                  case "ffd8ffe2":
+                  case "ffd8ffe3":
+                  case "ffd8ffe8":
+                        realMimeType = "image/jpeg";
+                        break;
+                  case "25504446":
+                     realMimeType = "application/pdf";
+                     break;
+                  default:
+                        realMimeType = "unknown"; // Or you can use the blob.type as fallback
+                        break;
+               }
+
+               return realMimeType;
+            }
+
+            var reader = new FileReader();
+            var readerBase64 = new FileReader();
+
+            reader.onloadend = function() {
+               var realMimeType = getRealMimeType(reader);
+               if (realMimeType !== 'unknown') {
+                     readerBase64.readAsDataURL(doc);
+               } else {
+                  document.getElementById("output").innerHTML = "Please upload a valid file";
+               }
             };
-            
-            // Use the fetch API to send the request to the specified URL
-            fetch("https://dummy.endpoint", requestOptions) // Replace "API_KEY" with your actual API endpoint
-              .then(response => response.text()) // Parse the response as text
-              .then(result => alert(JSON.parse(result).message)) // Parse the result as JSON and alert the message
-              .catch(error => console.log('error', error)); // Log any errors to the console
+
+            reader.readAsArrayBuffer(doc);
+
+            readerBase64.onloadend = function(){
+               let encoded = this.result.toString().replace(/^data:(.*,)?/, '');
+               if ((encoded.length % 4) > 0) {
+                  encoded += '='.repeat(4 - (encoded.length % 4));
+               }
+
+               // Define the request options including method, headers, body, and redirect behavior
+               let requestOptions = {
+                  method: 'POST', // Method type
+                  body: JSON.stringify({'document': encoded}), // The body of the request containing the JSON string
+                  redirect: 'follow' // Automatically follow redirects
+               };
+
+               document.getElementById("status").innerHTML = "Awating response from POWERFUL AI..."
+
+               // Use the fetch API to send the request to the specified URL
+               fetch("https://llo7lv3udf3cxr5wqdmnsank640xvwze.lambda-url.us-west-2.on.aws", requestOptions) // Replace "API_KEY" with your actual API endpoint
+                  .then(response => response.text()) // Parse the response as text
+                  .then(result => {
+                     document.getElementById("status").innerHTML = "Success"
+                     document.getElementById("result").innerHTML = result
+                  } ) // Parse the result as JSON and alert the message
+                  .catch(error => { document.getElementById("status").innerHTML = "Error: " + error }); // Log any errors to the console
+            };
          }
       </script>
    </head>
@@ -78,6 +133,8 @@
          <h1>Upload Regulatory Document</h1>
          <input type="file" id="fDoc" />
          <button type="button" onclick="callAPI(document.getElementById('fDoc').files[0])">Submit</button>
+         <div>Status: <div id="status"></div></div>
+         <div>Results: <div id="results"></div></div>
       </form>
    </body>
 </html>
