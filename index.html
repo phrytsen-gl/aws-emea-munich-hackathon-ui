@@ -121,9 +121,12 @@
                   .then(response => response.text()) // Parse the response as text
                   .then(result => {
                      document.getElementById("status").innerHTML = "Success"
-                     document.getElementById("results").innerHTML = result
+                     document.getElementById("results").innerHTML = result.replace(/\n/g, '<br />')
                   } ) // Parse the result as JSON and alert the message
-                  .catch(error => { document.getElementById("status").innerHTML = "Error: " + error }); // Log any errors to the console
+                  .catch(error => { 
+                     result
+                     document.getElementById("status").innerHTML = "Error: " + error.replace(/\n/g, '<br />')
+                  });
             };
          }
       </script>
@@ -134,7 +137,7 @@
          <input type="file" id="fDoc" />
          <button type="button" onclick="callAPI(document.getElementById('fDoc').files[0])">Submit</button>
          <div>Status: <div id="status"></div></div>
-         <div>Results: <div id="results"></div></div>
+         <div>Results: <pre id="results" style="white-space: pre-wrap;"></pre></div>
       </form>
    </body>
 </html>
