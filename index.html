@@ -121,7 +121,7 @@
                   .then(response => response.text()) // Parse the response as text
                   .then(result => {
                      document.getElementById("status").innerHTML = "Success"
-                     document.getElementById("result").innerHTML = result
+                     document.getElementById("results").innerHTML = result
                   } ) // Parse the result as JSON and alert the message
                   .catch(error => { document.getElementById("status").innerHTML = "Error: " + error }); // Log any errors to the console
             };
