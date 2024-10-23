@@ -1,143 +1,174 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
-   <head>
-      <meta charset="UTF-8">
-      <title>Regulatory Document SuperDuper System</title>
-      <style>
-         body {
-            background-color: #202b3c;
-            display: flex; /* Centering the form */
-            justify-content: center; /* Centering the form */
-            align-items: center; /* Centering the form */
-            height: 100vh; /* Centering the form */
-            margin: 0; /* Removing default margin */
-         }
-         .main-frame {
-            display: flex;
-            flex-direction: column; /* Aligning form elements vertically */
-            align-items: center; /* Centering form elements horizontally */
-            background-color: #fff; /* Adding a white background to the form */
-            padding: 20px; /* Adding padding to the form */
-            border-radius: 8px; /* Adding border radius to the form */
-         }
-         label, button {
-            color: #FF9900;
-            font-family: Arial, Helvetica, sans-serif;
-            font-size: 20px;
-            margin: 10px 0; /* Adding margin between elements */
-         }
-         input {
-            color: #232F3E;
-            font-family: Arial, Helvetica, sans-serif;
-            font-size: 20px;
-            margin: 10px 0; /* Adding margin between elements */
-            width: 80%; /* Setting input width */
-            padding: 5px; /* Adding padding to input */
-         }
-         button {
-            background-color: #FF9900; /* Adding background color to button */
-            color: #fff; /* Changing button text color */
-            border: none; /* Removing button border */
-            padding: 10px 20px; /* Adding padding to button */
-            cursor: pointer; /* Changing cursor to pointer on hover */
-         }
-         h1{
-            color: #202b3c;
-            font-family: Arial, Helvetica, sans-serif;
-         }
-      </style>
-      <script>
-         // Define the function to call the API with the provided first name, last name, and phone number
-         let callAPI = (doc)=>{
-            document.getElementById("status").innerHTML = "Processing..."
 
-            let getRealMimeType = function (reader) {
-               var arr = (new Uint8Array(reader.result)).subarray(0, 4);
-               var header = '';
-               var realMimeType;
+<head>
+   <meta charset="UTF-8">
+   <title>Regulatory Document SuperDuper System</title>
+   <style>
+      body {
+         background-color: #202b3c;
+         display: flex;
+         /* Centering the form */
+         justify-content: center;
+         /* Centering the form */
+         align-items: center;
+         /* Centering the form */
+         height: 100vh;
+         /* Centering the form */
+         margin: 0;
+         /* Removing default margin */
+      }
 
-               for (var i = 0; i < arr.length; i++) {
-                  header += arr[i].toString(16);
-               }
+      .main-frame {
+         display: flex;
+         flex-direction: column;
+         /* Aligning form elements vertically */
+         align-items: center;
+         /* Centering form elements horizontally */
+         background-color: #fff;
+         /* Adding a white background to the form */
+         padding: 20px;
+         /* Adding padding to the form */
+         border-radius: 8px;
+         /* Adding border radius to the form */
+      }
 
-               // magic numbers: http://www.garykessler.net/library/file_sigs.html
-               switch (header) {
-                  case "89504e47":
-                        realMimeType = "image/png";
-                        break;
-                  case "47494638":
-                        realMimeType = "image/gif";
-                        break;
-                  case "ffd8ffDB":
-                  case "ffd8ffe0":
-                  case "ffd8ffe1":
-                  case "ffd8ffe2":
-                  case "ffd8ffe3":
-                  case "ffd8ffe8":
-                        realMimeType = "image/jpeg";
-                        break;
-                  case "25504446":
-                     realMimeType = "application/pdf";
-                     break;
-                  default:
-                        realMimeType = "unknown"; // Or you can use the blob.type as fallback
-                        break;
-               }
+      label,
+      button {
+         color: #FF9900;
+         font-family: Arial, Helvetica, sans-serif;
+         font-size: 20px;
+         margin: 10px 0;
+         /* Adding margin between elements */
+      }
 
-               return realMimeType;
+      input {
+         color: #232F3E;
+         font-family: Arial, Helvetica, sans-serif;
+         font-size: 20px;
+         margin: 10px 0;
+         /* Adding margin between elements */
+         width: 80%;
+         /* Setting input width */
+         padding: 5px;
+         /* Adding padding to input */
+      }
+
+      button {
+         background-color: #FF9900;
+         /* Adding background color to button */
+         color: #fff;
+         /* Changing button text color */
+         border: none;
+         /* Removing button border */
+         padding: 10px 20px;
+         /* Adding padding to button */
+         cursor: pointer;
+         /* Changing cursor to pointer on hover */
+      }
+
+      h1 {
+         color: #202b3c;
+         font-family: Arial, Helvetica, sans-serif;
+      }
+   </style>
+   <script>
+      // Define the function to call the API with the provided first name, last name, and phone number
+      let callAPI = (doc) => {
+         document.getElementById("status").innerHTML = "Processing..."
+
+         let getRealMimeType = function (reader) {
+            var arr = (new Uint8Array(reader.result)).subarray(0, 4);
+            var header = '';
+            var realMimeType;
+
+            for (var i = 0; i < arr.length; i++) {
+               header += arr[i].toString(16);
             }
 
-            var reader = new FileReader();
-            var readerBase64 = new FileReader();
+            // magic numbers: http://www.garykessler.net/library/file_sigs.html
+            switch (header) {
+               case "89504e47":
+                  realMimeType = "image/png";
+                  break;
+               case "47494638":
+                  realMimeType = "image/gif";
+                  break;
+               case "ffd8ffDB":
+               case "ffd8ffe0":
+               case "ffd8ffe1":
+               case "ffd8ffe2":
+               case "ffd8ffe3":
+               case "ffd8ffe8":
+                  realMimeType = "image/jpeg";
+                  break;
+               case "25504446":
+                  realMimeType = "application/pdf";
+                  break;
+               default:
+                  realMimeType = "unknown"; // Or you can use the blob.type as fallback
+                  break;
+            }
 
-            reader.onloadend = function() {
-               var realMimeType = getRealMimeType(reader);
-               if (realMimeType !== 'unknown') {
-                     readerBase64.readAsDataURL(doc);
-               } else {
-                  document.getElementById("output").innerHTML = "Please upload a valid file";
-               }
-            };
-
-            reader.readAsArrayBuffer(doc);
-
-            readerBase64.onloadend = function(){
-               let encoded = this.result.toString().replace(/^data:(.*,)?/, '');
-               if ((encoded.length % 4) > 0) {
-                  encoded += '='.repeat(4 - (encoded.length % 4));
-               }
-
-               // Define the request options including method, headers, body, and redirect behavior
-               let requestOptions = {
-                  method: 'POST', // Method type
-                  body: JSON.stringify({'document': encoded}), // The body of the request containing the JSON string
-                  redirect: 'follow' // Automatically follow redirects
-               };
-
-               document.getElementById("status").innerHTML = "Awating response from POWERFUL AI..."
-
-               // Use the fetch API to send the request to the specified URL
-               fetch("https://llo7lv3udf3cxr5wqdmnsank640xvwze.lambda-url.us-west-2.on.aws", requestOptions) // Replace "API_KEY" with your actual API endpoint
-                  .then(response => response.text()) // Parse the response as text
-                  .then(result => {
-                     document.getElementById("status").innerHTML = "Success"
-                     document.getElementById("results").innerHTML = result.replaceAll(/\\n/g, '<br />')
-                  } ) // Parse the result as JSON and alert the message
-                  .catch(error => { 
-                     result
-                     document.getElementById("status").innerHTML = "Error: " + error.replaceAll(/\\n/g, '<br />')
-                  });
-            };
+            return realMimeType;
          }
-      </script>
-   </head>
-   <body>
-      <form class="main-frame" id="send-form">
-         <h1>Upload Regulatory Document</h1>
-         <input type="file" id="fDoc" />
-         <button type="button" onclick="callAPI(document.getElementById('fDoc').files[0])">Submit</button>
-         <div>Status: <div id="status"></div></div>
-         <div>Results: <div id="results" style="white-space: pre-wrap;"></div></div>
-      </form>
-   </body>
+
+         var reader = new FileReader();
+         var readerBase64 = new FileReader();
+
+         reader.onloadend = function () {
+            var realMimeType = getRealMimeType(reader);
+            if (realMimeType !== 'unknown') {
+               readerBase64.readAsDataURL(doc);
+            } else {
+               document.getElementById("output").innerHTML = "Please upload a valid file";
+            }
+         };
+
+         reader.readAsArrayBuffer(doc);
+
+         readerBase64.onloadend = function () {
+            let encoded = this.result.toString().replace(/^data:(.*,)?/, '');
+            if ((encoded.length % 4) > 0) {
+               encoded += '='.repeat(4 - (encoded.length % 4));
+            }
+
+            // Define the request options including method, headers, body, and redirect behavior
+            let requestOptions = {
+               method: 'POST', // Method type
+               body: JSON.stringify({ 'document': encoded }), // The body of the request containing the JSON string
+               redirect: 'follow' // Automatically follow redirects
+            };
+
+            document.getElementById("status").innerHTML = "Awating response from POWERFUL AI..."
+
+            // Use the fetch API to send the request to the specified URL
+            fetch("YOUR AWS LAMBDA FUNCTION (OR API ENDPOINT) PUBLIC URL", requestOptions) // Replace "API_KEY" with your actual API endpoint
+               .then(response => response.text()) // Parse the response as text
+               .then(result => {
+                  document.getElementById("status").innerHTML = "Success"
+                  document.getElementById("results").innerHTML = result.replaceAll(/\\n/g, '<br />')
+               }) // Parse the result as JSON and alert the message
+               .catch(error => {
+                  result
+                  document.getElementById("status").innerHTML = "Error: " + error.replaceAll(/\\n/g, '<br />')
+               });
+         };
+      }
+   </script>
+</head>
+
+<body>
+   <form class="main-frame" id="send-form">
+      <h1 style="color: red;">Service Message: Replace the fetch URL in the JS code</h1>
+      <h1>Upload Regulatory Document</h1>
+      <input type="file" id="fDoc" />
+      <button type="button" onclick="callAPI(document.getElementById('fDoc').files[0])">Submit</button>
+      <div>Status: <div id="status"></div>
+      </div>
+      <div>Results: <div id="results" style="white-space: pre-wrap;"></div>
+      </div>
+   </form>
+</body>
+
 </html>
