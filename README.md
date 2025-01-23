@@ -1,5 +1,8 @@
 # AWS EMEA GenAI Automotive Hackathon - AI-Powered Regulatory Compliance System PoC
 
+<img src="./example/AWS-EMEA-GenAI-Automotive-Hackathon-Solution-Demo-1.png" width="400">
+<img src="./example/AWS-EMEA-GenAI-Automotive-Hackathon-Solution-Demo-2.png" width="400">
+
 ## AWS Lambda Configuration
 Lambda serves as a simple API endpoint.
 
